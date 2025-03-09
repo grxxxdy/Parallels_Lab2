@@ -8,16 +8,25 @@ class Program
     {
         const int numsSize = 100000000;
         const int numToCompare = 101;
+        const int threadAmount = 6;
 
         NumList nums = new NumList(numsSize);
-        Stopwatch stopwatch = new Stopwatch();
-        
-        stopwatch.Start();
         nums.FillWithRands();
-        stopwatch.Stop();
+        
+        Console.WriteLine($"List size: {numsSize}\n");
+        
+        Console.WriteLine("------------Linear solution------------");
+        ExecuteLinear(nums, numToCompare);
+        Console.WriteLine("---------------------------------------\n");
+        
+        Console.WriteLine("------------Mutex solution------------");
+        ExecuteMutex(nums, numToCompare, threadAmount);
+        Console.WriteLine("---------------------------------------\n");
+    }
 
-        long fillTime = stopwatch.ElapsedMilliseconds;
-        stopwatch.Reset();
+    static void ExecuteLinear(NumList nums, int numToCompare)
+    {
+        Stopwatch stopwatch = new Stopwatch();
         
         stopwatch.Start();
         int count = nums.CountBiggerNumbers(numToCompare);
@@ -33,13 +42,35 @@ class Program
         long searchTime = stopwatch.ElapsedMilliseconds;
         stopwatch.Reset();
         
-        Console.WriteLine($"List size: {numsSize}\n");
-        Console.WriteLine($"Fill time: {fillTime}");
         Console.WriteLine($"Count time: {countTime}");
         Console.WriteLine($"Search time: {searchTime}");
-        Console.WriteLine($"Total time: {fillTime + countTime + searchTime}\n");
+        Console.WriteLine($"Total time: {countTime + searchTime}\n");
         Console.WriteLine($"Elements bigger than {numToCompare}: {count}");
         Console.WriteLine($"Max number: {max}");
+    }
+    
+    static void ExecuteMutex(NumList nums, int numToCompare, int threadAmount)
+    {
+        Stopwatch stopwatch = new Stopwatch();
         
+        stopwatch.Start();
+        int count = nums.CountBiggerNumbersMutex(numToCompare, threadAmount);
+        stopwatch.Stop();
+        
+        long countTime = stopwatch.ElapsedMilliseconds;
+        stopwatch.Reset();
+        
+        stopwatch.Start();
+        int max = nums.FindMaxMutex(threadAmount);
+        stopwatch.Stop();
+        
+        long searchTime = stopwatch.ElapsedMilliseconds;
+        stopwatch.Reset();
+        
+        Console.WriteLine($"Count time: {countTime}");
+        Console.WriteLine($"Search time: {searchTime}");
+        Console.WriteLine($"Total time: {countTime + searchTime}\n");
+        Console.WriteLine($"Elements bigger than {numToCompare}: {count}");
+        Console.WriteLine($"Max number: {max}");
     }
 }
